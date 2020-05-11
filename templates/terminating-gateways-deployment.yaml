@@ -1,8 +1,17 @@
 {{- if .Values.terminatingGateways.enabled }}
 {{- $root := . }}
 {{- $defaults := .Values.terminatingGateways.defaults }}
+{{- $names := dict }}
 {{- range .Values.terminatingGateways.gateways }}
-# TODO: Check that name is not empty
+{{- if empty .name }}
+# Check that name is not empty
+{{ fail "Terminating gateway names cannot be empty"}}
+{{ end -}}
+{{- if hasKey $names .name }}
+# Check that the name doesn't already exist
+{{ fail "Terminating gateway names must be unique"}}
+{{ end -}}
+{{- $_ := set $names .name .name }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
